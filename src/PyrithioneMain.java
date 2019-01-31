@@ -10,6 +10,7 @@ public class PyrithioneMain {
             double k =  new PoissonDistribution(7.3).getNumericalMean();
             System.out.println(k);
         }*/
-        BioSystem.tester();
+        //BioSystem.tester();
+        BioSystem.getPopDistbInfo();
     }
 }

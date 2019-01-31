@@ -48,7 +48,7 @@ public class Microhabitat {
         //this returns a paramteter between 0 and 1 which gives the stickiness of the biofilm
         //the closer to 1, the stickier the biofilm, the less easy it is for the bacteria to move
         if(surface) return 1.;
-        else if(getN() < threshold_stickiness*K) return 0.0;
+        else if(getN() < threshold_stickiness*K) return 0.; //this is to prevent poisson errors
 
         else{
             double alpha = Math.log(2.)/((1. - threshold_stickiness)*K);

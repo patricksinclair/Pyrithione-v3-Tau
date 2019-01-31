@@ -5,15 +5,15 @@ import java.io.IOException;
 
 public class Toolbox {
 
-    public static double[] averagedResults(int[][] inputData){
+    public static double[] averagedResults(double[][] inputData){
 
         int nReps = inputData.length;
-        int nCounters = inputData[0].length;
+        int nMeasurements = inputData[0].length;
 
-        double[] averagedResults = new double[nCounters];
+        double[] averagedResults = new double[nMeasurements];
 
         //iterate over the counters, checking all the reps, then moving to next counter
-        for(int c = 0; c < nCounters; c++){
+        for(int c = 0; c < nMeasurements; c++){
             double runningTotal = 0.;
             for(int r = 0; r < nReps; r++){
                 runningTotal += inputData[r][c];
@@ -23,8 +23,58 @@ public class Toolbox {
         return averagedResults;
     }
 
+    public static double[][] averagedResults(double[][][] inputData){
 
-    public static void writeSimpleArrayAndHeadersToFile(String filename, String[] headers, double[] data){
+        int nReps = inputData.length;
+        int nTimes = inputData[0].length;
+        int L = inputData[0][0].length;
+
+        double[][] averagedResults = new double[nTimes][L];
+
+        for(int t = 0; t < nTimes; t++){
+
+            for(int l = 0; l < L; l++){
+
+                double runningTotal = 0.;
+
+                for(int r = 0; r < nReps; r++){
+                    runningTotal += inputData[r][t][l];
+                }
+                averagedResults[t][l] = runningTotal/(double)nReps;
+            }
+        }
+        return averagedResults;
+    }
+
+
+    public static void writeAveragedDistbsToFile(String filename, double[][] inputData){
+
+        try {
+            File file = new File(filename+".txt");
+            if(!file.exists()) file.createNewFile();
+
+            FileWriter fw = new FileWriter(file.getAbsoluteFile());
+            BufferedWriter bw = new BufferedWriter(fw);
+
+            int nTimes = inputData.length;
+            int L = inputData[0].length;
+
+            for(int l = 0; l < L; l++){
+                String output = String.valueOf(l)+" ";
+                for(int t = 0; t < nTimes; t++){
+                    output += String.valueOf(inputData[t][l]+ " ");
+                }
+                bw.write(output);
+                bw.newLine();
+            }
+            bw.close();
+        }catch (IOException e){}
+    }
+
+
+
+
+    public static void writeAveragedArrayToFile(String filename, double[] data){
 
         try{
             File file = new File(filename+".txt");
@@ -36,17 +86,13 @@ public class Toolbox {
             String headerString = "#";
             String dataString = "";
 
-            for(int i = 0; i < headers.length; i++){
-                headerString+=headers[i]+"\t";
-                dataString+=data[i]+"\t";
+            for(int i = 0; i < data.length; i++){
+                bw.write(String.valueOf(data[i]));
+                bw.newLine();
             }
-
-            bw.write(headerString.trim());
-            bw.newLine();
-            bw.write(dataString.trim());
             bw.close();
 
-
         }catch (IOException e){}
+
     }
 }
