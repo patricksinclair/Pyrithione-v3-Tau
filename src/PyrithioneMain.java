@@ -1,5 +1,3 @@
-import org.apache.commons.math3.distribution.PoissonDistribution;
-
 public class PyrithioneMain {
 
     public static void main(String[] args){

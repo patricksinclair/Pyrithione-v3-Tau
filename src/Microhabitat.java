@@ -76,8 +76,9 @@ public class Microhabitat {
 
     public double replicationOrDeathRate(int index){
         //returns either +ve phi(c)*(1-N/k) [replication] or -ve phi(c) [death]
-        double gRate = phi_c(index)*(1. - getN()/K);
-        return  (gRate > 0.) ? gRate : phi_c(index);
+        //^TODO handle the double negative stuff here
+        //double gRate = phi_c(index)*(1. - getN()/K);
+        return  (phi_c(index) > 0.) ? phi_c(index)*(1. - getN()/K) : phi_c(index);
     }
 
     public double deathRate(int index){
