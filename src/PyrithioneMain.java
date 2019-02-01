@@ -9,6 +9,7 @@ public class PyrithioneMain {
             System.out.println(k);
         }*/
         //BioSystem.tester();
+        System.out.println("UPDATED 2");
         BioSystem.getPopDistbInfo();
     }
 }
