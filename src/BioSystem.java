@@ -292,7 +292,7 @@ public class BioSystem {
         int K = 500, L = 500;
         double c_max = 10., alpha = 0.01, tau = 0.01;
 
-        int nReps = 1, nMeasurements = 20;
+        int nReps = 10, nMeasurements = 20;
         double duration = 200., interval = duration/nMeasurements;
 
         String popSizeFilename = "pyrithione-testing-pop_size";

@@ -62,7 +62,7 @@ public class Toolbox {
             for(int l = 0; l < L; l++){
                 String output = String.valueOf(l)+" ";
                 for(int t = 0; t < nTimes; t++){
-                    output += String.valueOf(inputData[t][l]+ " ");
+                    output += String.format("%.6f ", inputData[t][l]);
                 }
                 bw.write(output);
                 bw.newLine();
