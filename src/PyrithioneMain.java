@@ -2,6 +2,8 @@ public class PyrithioneMain {
 
     public static void main(String[] args){
 
+        //javac -cp commons-math3-3.6.1.jar:commons-math3-3.6.1-javadoc.jar:commons-math3-3.6.1-sources.jar:commons-math3-3.6.1-tests.jar:commons-math3-3.6.1-test-sources.jar:commons-math3-3.6.1-tools.jar:. *.java
+
         /*PoissonDistribution pD = new PoissonDistribution(1);
 
         for(int i = 0; i < 10; i++){
@@ -9,7 +11,7 @@ public class PyrithioneMain {
             System.out.println(k);
         }*/
         //BioSystem.tester();
-        System.out.println("UPDATED 2");
+        System.out.println("UPDATED ST DEV");
         BioSystem.getPopDistbInfo();
     }
 }

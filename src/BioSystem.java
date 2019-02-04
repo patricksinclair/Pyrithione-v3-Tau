@@ -95,6 +95,14 @@ public class BioSystem {
         return avgGenos;
     }
 
+    public double[] getStDevOfGenotypeDistribution(){
+        double[] genoStDevs = new double[L];
+        for(int i = 0; i < L; i++){
+            genoStDevs[i] = microhabitats[i].getStDevOfGenotype();
+        }
+        return genoStDevs;
+    }
+
 
 
     public void replicate(int mh_index, int bac_index){
@@ -189,7 +197,6 @@ public class BioSystem {
         for(int mh_index = getBiofilmEdge()-1; mh_index < L; mh_index++){
 
             int mh_pop = microhabitats[mh_index].getN();
-            //System.out.println("mh_index: "+mh_index+"\tmh_pop: "+mh_pop+"\tmigrate_rate: "+microhabitats[mh_index].migrate_rate());
 
             double migration_rate = microhabitats[mh_index].migrate_rate();
             int n_migrations = (migration_rate > 0) ? new PoissonDistribution(migration_rate*tau).sample() : 0;
@@ -200,10 +207,9 @@ public class BioSystem {
             for(int bac_index = 0; bac_index < mh_pop; bac_index++){
                 //works out the no. of replications each bacteria undergoes
                 double gOrDRate_i = microhabitats[mh_index].replicationOrDeathRate(bac_index);
-                //System.out.println("gdRate: "+gOrDRate_i);
 
                 if(gOrDRate_i == 0){
-                    //this tops the poisson distribution getting funky with mean=0
+                    //this stops the poisson distribution getting funky with mean=0
                     n_replications[bac_index] = 0;
                     n_deaths[bac_index] = 0;
 
@@ -228,21 +234,11 @@ public class BioSystem {
         int mh_counter2 = 0;
         for(int mh_index = getBiofilmEdge()-1; mh_index < L; mh_index++){
 
-            int mh_pop = microhabitats[mh_index].getN();
-            //System.out.println("mh_index: "+mh_index+"\tmh_pop: "+mh_pop+"\tmigrate_rate: "+microhabitats[mh_index].migrate_rate());
-
-
             int originalPopSize = microhabitats[mh_index].getN(); //the original length of the arraylist before anything happens
 
             //iterate backwards so we can also remove bacteria
             for(int bac_index = originalPopSize-1; bac_index >= 0; bac_index--){
 
-                /*if(bac_index==originalPopSize-1){
-                    System.out.println("bac_index: "+bac_index+"\toriginalPopSize: "+originalPopSize
-                            +"\trepAllocMatrixSize: "+replicationAllocations[mh_counter2].length);
-                }*/
-
-                //replicates the specified bactera a specified no. of times
                 updated_microhabs[mh_index].replicateABacterium_x_N(bac_index, replicationAllocations[mh_counter2][bac_index]);
 
                 if(deathAllocations[mh_counter2][bac_index] > 0) updated_microhabs[mh_index].removeABacterium(bac_index);
@@ -257,25 +253,14 @@ public class BioSystem {
         for(int mh_index = getBiofilmEdge()-1; mh_index < L; mh_index++){
 
             int originalPopSize = microhabitats[mh_index].getN();
-            /*
-            int nReplications = IntStream.of(replicationAllocations[mh_counter_migration]).sum();
-            int nDeaths = IntStream.of(deathAllocations[mh_counter_migration]).sum();
 
-            if((migrationAllocations[mh_counter_migration]!=0))System.out.println("mh_index: "+mh_index+"\tmh_pop: "+originalPopSize+"\tmigrate_rate: "+microhabitats[mh_index].migrate_rate()+
-                    "\tnMigrations out: "+ migrationAllocations[mh_counter_migration]+"\tnReplications: "+nReplications+"\tnDeaths: "+nDeaths);
-             */
-
-            //this needs to be done on updated_microhabitats
             migrate_v2(updated_microhabs, mh_index, migrationAllocations[mh_counter_migration], originalPopSize);
             mh_counter_migration++;
         }
 
         //replace old system with new
         microhabitats = updated_microhabs;
-        //System.out.println("--------IMMIGRATION------------");
-        //System.out.println("mh_index: "+getBiofilmEdge()+"\tnImmigrants: "+nImmigrants);
         immigrate(nImmigrants, getBiofilmEdge()-1);
-        //System.out.println("----------------------------------------");
         updateBiofilmSize();
         timeElapsed += tau;
     }
@@ -295,15 +280,17 @@ public class BioSystem {
         int nReps = 10, nMeasurements = 20;
         double duration = 200., interval = duration/nMeasurements;
 
-        String popSizeFilename = "pyrithione-testing-pop_size";
-        String popDistbFilename = "pyrithione-testing-pop_distb";
-        String biofilmEdgeFilename = "pyrithione-testing-biofilm_edge";
-        String avgGenotypeDistbFilename = "pyrithione-testing-avgGenoDistb";
+        String popSizeFilename = "pyrithione-testing-pop_size-t=200";
+        String popDistbFilename = "pyrithione-testing-pop_distb-t=200";
+        String biofilmEdgeFilename = "pyrithione-testing-biofilm_edge-t=200";
+        String avgGenotypeDistbFilename = "pyrithione-testing-avgGenoDistb-t=200";
+        String genoStDevDistbFilename = "pyrithione-testing-genoStDevDistb-t=200";
 
         double[][] allPopSizes = new double[nReps][];
         double[][][] allPopDistbs = new double[nReps][][];
         double[][] allBiofilmEdges = new double[nReps][];
         double[][][] allAvgGenotypeDistbs = new double[nReps][][];
+        double[][][] allGenoStDevs = new double[nReps][][];
 
 
         for(int r = 0; r < nReps; r++){
@@ -317,6 +304,7 @@ public class BioSystem {
             double[][] popDistbs = new double[nMeasurements+1][];
             double[] biofilmEdges = new double[nMeasurements+1];
             double[][] avgGenotypeDistbs = new double[nMeasurements+1][];
+            double[][] genoStDevs = new double[nMeasurements+1][];
 
 
             while(bs.timeElapsed <= duration+0.2*interval){
@@ -332,6 +320,7 @@ public class BioSystem {
                     popDistbs[timerCounter] = bs.getPopulationDistribution();
                     biofilmEdges[timerCounter] = bs.getBiofilmEdge();
                     avgGenotypeDistbs[timerCounter] = bs.getAvgGenotypeDistribution();
+                    genoStDevs[timerCounter] = bs.getStDevOfGenotypeDistribution();
 
                     alreadyRecorded = true;
                     timerCounter++;
@@ -345,17 +334,20 @@ public class BioSystem {
             allPopDistbs[r] = popDistbs;
             allBiofilmEdges[r] = biofilmEdges;
             allAvgGenotypeDistbs[r] = avgGenotypeDistbs;
+            allGenoStDevs[r] = genoStDevs;
         }
 
         double[] processedPopSizes = Toolbox.averagedResults(allPopSizes);
         double[][] processedPopDistbs = Toolbox.averagedResults(allPopDistbs);
         double[] processedBiofilmEdges = Toolbox.averagedResults(allBiofilmEdges);
         double[][] processedAvgGenotypeDistbs = Toolbox.averagedResults(allAvgGenotypeDistbs);
+        double[][] processedGenoStDevs = Toolbox.averagedResults(allGenoStDevs);
 
         Toolbox.writeAveragedArrayToFile(popSizeFilename, processedPopSizes);
         Toolbox.writeAveragedDistbsToFile(popDistbFilename, processedPopDistbs);
         Toolbox.writeAveragedArrayToFile(biofilmEdgeFilename, processedBiofilmEdges);
         Toolbox.writeAveragedDistbsToFile(avgGenotypeDistbFilename, processedAvgGenotypeDistbs);
+        Toolbox.writeAveragedDistbsToFile(genoStDevDistbFilename, processedGenoStDevs);
     }
 
 

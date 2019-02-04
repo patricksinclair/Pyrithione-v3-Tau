@@ -67,9 +67,6 @@ public class Microhabitat {
     }
 
     public double phi_c(int index){
-        //double phi_c = 1. - (c/beta(index))*(c/beta(index));
-        //return  (phi_c > 0.) ? phi_c : 0.;
-        //use the 6x/1+5x one for this at the mo
         double cB = c/beta(index);
         return 1. - 6*cB*cB/(5. + cB*cB);
     }
@@ -77,7 +74,6 @@ public class Microhabitat {
     public double replicationOrDeathRate(int index){
         //returns either +ve phi(c)*(1-N/k) [replication] or -ve phi(c) [death]
         //^TODO handle the double negative stuff here
-        //double gRate = phi_c(index)*(1. - getN()/K);
         return  (phi_c(index) > 0.) ? phi_c(index)*(1. - getN()/K) : phi_c(index);
     }
 
@@ -97,6 +93,24 @@ public class Microhabitat {
             }
             return sum/(double)getN();
         }
+    }
+
+
+    public double getStDevOfGenotype(){
+        if(getN() == 0) return 0.;
+        else {
+            double mean = getAvgGenotype();
+            double sumSq = 0.;
+
+            for(Double geno : population){
+                sumSq += (geno-mean)*(geno-mean);
+            }
+
+            return Math.sqrt(sumSq/(getN()-1));
+        }
+
+
+
     }
 
 

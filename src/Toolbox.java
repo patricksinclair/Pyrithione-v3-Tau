@@ -2,8 +2,41 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.ArrayList;
 
 public class Toolbox {
+
+
+    public static double averageOfArrayList(ArrayList<Double> listo){
+
+        if(listo.size() > 0) {
+            double sum = 0.;
+
+            for(Double d : listo) {
+                sum += d;
+            }
+
+            return sum/(double) listo.size();
+        }else{
+            return 0.;
+        }
+    }
+
+
+    public static double stDevOfArrayList(ArrayList<Double> listo){
+
+        if(listo.size() > 0) {
+            double mean = Toolbox.averageOfArrayList(listo);
+            double sumSq = 0.;
+
+            for(Double d : listo) {
+                sumSq += (d-mean)*(d-mean);
+            }
+            return Math.sqrt(sumSq/(listo.size()-1));
+        }else{
+            return 0.;
+        }
+    }
 
     public static double[] averagedResults(double[][] inputData){
 
@@ -95,4 +128,7 @@ public class Toolbox {
         }catch (IOException e){}
 
     }
+
+
+
 }
