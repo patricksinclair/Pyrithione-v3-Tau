@@ -34,7 +34,7 @@ public class BioSystem {
 
         microhabitats[L-1].setSurface(true);
         microhabitats[L-1].setBiofilm_region(true);
-        microhabitats[L-1].randomlyPopulate(100);
+        microhabitats[L-1].randomlyPopulate(25);
 
         doubleDeathCounter = 0;
 
