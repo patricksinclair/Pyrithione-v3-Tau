@@ -341,8 +341,8 @@ public class BioSystem {
 
                 if((bs.getTimeElapsed()%interval >= 0. && bs.getTimeElapsed()%interval <= 0.1*interval) && !alreadyRecorded){
 
-                    String output = String.format("rep: %d \ttime elapsed: %.3f \ttotal N: %d \tbiofilm edge: %d \tdouble deaths: %d",
-                            r, bs.getTimeElapsed(), bs.getTotalN(), bs.getBiofilmEdge(), bs.getDoubleDeathCounter());
+                    String output = String.format("time elapsed: %.3f \ttotal N: %d \tbiofilm edge: %d \tdouble deaths: %d / %d",
+                            bs.getTimeElapsed(), bs.getTotalN(), bs.getBiofilmEdge(), bs.getDoubleDeathCounter(), bs.getDeathCountero());
 
                     System.out.println(output);
 
@@ -404,7 +404,7 @@ public class BioSystem {
             // if((bs.getTimeElapsed()%interval >= 0. && bs.getTimeElapsed()%interval <= 0.1*interval) && !alreadyRecorded){
 
             String output = String.format("time elapsed: %.3f \ttotal N: %d \tbiofilm edge: %d \tdouble deaths: %d / %d",
-                    bs.getTimeElapsed(), bs.getTotalN(), bs.getBiofilmEdge(), bs.getDoubleDeathCounter(), bs.getDeathCountero());
+                    bs.getTimeElapsed(), bs.getTotalN(), bs.getBiofilmEdge(), bs.getDoubleDeathCounter(), bs.getDoubleDeathCounter());
 
             System.out.println(output);
             //System.out.println(bs.getDeathCountero());
