@@ -11,7 +11,7 @@ public class PyrithioneMain {
             System.out.println(k);
         }*/
         //BioSystem.tester();
-        System.out.println("UPDATED SMALLER START POP");
+        System.out.println("UPDATED ST DEV");
         BioSystem.getPopDistbInfo();
     }
 }

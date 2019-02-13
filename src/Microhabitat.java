@@ -19,6 +19,10 @@ public class Microhabitat {
     private boolean biofilm_region = false; //boolean detailing whther this microhabitat is the well-mixed ocean environment or the biofilm region
     private double threshold_stickiness = 0.15; //fraction occupied required for biofilm formation to begin
 
+    //counters for events in each microhab
+    private int immigrationCounter, migrationInCounter, migrationOutCounter, detatchmentCounter;
+    private int replicationCounter, deathCounter;
+
 
 
     public Microhabitat(int K, double c){
@@ -26,7 +30,25 @@ public class Microhabitat {
         this.c = c;
         this.b = 0.1;
         this.population = new ArrayList<>(K);
+
+        this.immigrationCounter = 0; this.migrationInCounter=0; this.migrationOutCounter=0; this.detatchmentCounter=0;
+        this.replicationCounter=0; this.deathCounter=0;
     }
+
+
+    public int getImmigrationCounter(){return immigrationCounter;}
+    public int getMigrationInCounter(){return migrationInCounter;}
+    public int getMigrationOutCounter(){return migrationOutCounter;}
+    public int getDetatchmentCounter(){return detatchmentCounter;}
+    public int getReplicationCounter(){return replicationCounter;}
+    public int getDeathCounter(){return deathCounter;}
+
+    public void updateImmigrationCounter(int increase){this.immigrationCounter+=increase;}
+    public void updateMigrationInCounter(int increase){this.migrationInCounter+=increase;}
+    public void updateMigrationOutCounter(int increase){this.migrationOutCounter+=increase;}
+    public void updateDetatchmentCounter(int increase){this.detatchmentCounter+=increase;}
+    public void updateReplicationCounter(int increase){this.replicationCounter+=increase;}
+    public void updateDeathCounter(int increase){this.deathCounter+=increase;}
 
 
     public int getN(){return population.size();}
@@ -56,9 +78,9 @@ public class Microhabitat {
         }
     }
 
-
+    //1e-9 to stop 0 from interfering with poisson distbs
     public double migrate_rate(){
-        return b*(1. - stickiness());
+        return b*(1. - stickiness())+1e-9;
     }
 
 
@@ -97,7 +119,7 @@ public class Microhabitat {
 
 
     public double getStDevOfGenotype(){
-        if(getN() == 0) return 0.;
+        if(getN() <= 1) return 0.;
         else {
             double mean = getAvgGenotype();
             double sumSq = 0.;
