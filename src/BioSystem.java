@@ -13,7 +13,7 @@ public class BioSystem {
     private double tau;
 
     //counters to keep track of the number of events that happen
-    private int doubleDeathCounter;
+    private int doubleDeathCounter, deathCountero;
 
 
     public BioSystem(int L, int K, double alpha, double c_max, double tau){
@@ -38,6 +38,7 @@ public class BioSystem {
 
     public double getTimeElapsed(){return timeElapsed;}
     public int getDoubleDeathCounter(){return doubleDeathCounter;}
+    public int getDeathCountero(){return deathCountero;}
 
 
     public int getTotalN(){
@@ -91,7 +92,7 @@ public class BioSystem {
         return genoStDevs;
     }
 
-    public int[][] getXountersArray(String[] headers){
+    public int[][] getCountersArray(String[] headers){
         int[][] countersArray = new int[headers.length][L];
         for(int i = 0; i < L; i++){
             countersArray[0][i] = microhabitats[i].getImmigrationCounter();
@@ -257,7 +258,10 @@ public class BioSystem {
                 updated_microhabs[mh_index].replicateABacterium_x_N(bac_index, replicationAllocations[mh_counter2][bac_index]);
                 updated_microhabs[mh_index].updateReplicationCounter(replicationAllocations[mh_counter2][bac_index]);
 
-                if(deathAllocations[mh_counter2][bac_index] > 0) updated_microhabs[mh_index].removeABacterium(bac_index);
+                if(deathAllocations[mh_counter2][bac_index] > 0) {
+                    updated_microhabs[mh_index].removeABacterium(bac_index);
+                    deathCountero++;
+                }
                 if(deathAllocations[mh_counter2][bac_index] > 1) doubleDeathCounter++;
                 updated_microhabs[mh_index].updateDeathCounter(deathAllocations[mh_counter2][bac_index]);
 
@@ -398,8 +402,8 @@ public class BioSystem {
 
             // if((bs.getTimeElapsed()%interval >= 0. && bs.getTimeElapsed()%interval <= 0.1*interval) && !alreadyRecorded){
 
-            String output = String.format("time elapsed: %.3f \ttotal N: %d \tbiofilm edge: %d \tdouble deaths: %d",
-                    bs.getTimeElapsed(), bs.getTotalN(), bs.getBiofilmEdge(), bs.getDoubleDeathCounter());
+            String output = String.format("time elapsed: %.3f \ttotal N: %d \tbiofilm edge: %d \tdouble deaths: %d / %d",
+                    bs.getTimeElapsed(), bs.getTotalN(), bs.getBiofilmEdge(), bs.getDoubleDeathCounter(), bs.getDeathCountero());
 
             System.out.println(output);
 
