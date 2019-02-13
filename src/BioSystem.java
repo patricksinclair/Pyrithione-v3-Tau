@@ -34,6 +34,7 @@ public class BioSystem {
         microhabitats[L-1].randomlyPopulate(25);
 
         doubleDeathCounter = 0;
+        deathCountero = 0;
     }
 
     public double getTimeElapsed(){return timeElapsed;}
@@ -406,6 +407,7 @@ public class BioSystem {
                     bs.getTimeElapsed(), bs.getTotalN(), bs.getBiofilmEdge(), bs.getDoubleDeathCounter(), bs.getDeathCountero());
 
             System.out.println(output);
+            //System.out.println(bs.getDeathCountero());
 
             //System.out.println(Arrays.toString(bs.getNutrientsArray()));
             alreadyRecorded = true;
