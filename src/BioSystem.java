@@ -51,6 +51,14 @@ public class BioSystem {
         return  runningTotal;
     }
 
+    public double[] getCVals(){
+        double[] cVals = new double[L];
+        for(int i = 0; i < L; i++){
+            cVals[i] = microhabitats[i].getC();
+        }
+        return cVals;
+    }
+
     public int getBiofilmEdge(){
         //finds the microhabitat furthest from the surface which is part of the biofilm
         int edgeIndex = 0;
@@ -137,24 +145,24 @@ public class BioSystem {
                 if(mh_index == L - 1) {
                     microhabitats[mh_index].removeABacterium(bac_index);
                     microhabitats[mh_index - 1].addABacterium(rand_bac);
-                    microhabitats[mh_index-1].updateMigrationInCounter(1);
+                    //microhabitats[mh_index-1].updateMigrationInCounter(1);
 
                 } else if(mh_index == biof_edge) {
                     //if the bacteria is at the edge of the biofilm, there's a chance it detached, depending on the stickiness
                     //ADD IN LATER
                     microhabitats[mh_index].removeABacterium(bac_index);
                     microhabitats[mh_index + 1].addABacterium(rand_bac);
-                    microhabitats[mh_index+1].updateMigrationInCounter(1);
+                    //microhabitats[mh_index+1].updateMigrationInCounter(1);
 
                 } else {
                     if(rand.nextBoolean()) {
                         microhabitats[mh_index].removeABacterium(bac_index);
                         microhabitats[mh_index + 1].addABacterium(rand_bac);
-                        microhabitats[mh_index+1].updateMigrationInCounter(1);
+                        //microhabitats[mh_index+1].updateMigrationInCounter(1);
                     } else {
                         microhabitats[mh_index].removeABacterium(bac_index);
                         microhabitats[mh_index - 1].addABacterium(rand_bac);
-                        microhabitats[mh_index-1].updateMigrationInCounter(1);
+                        //microhabitats[mh_index-1].updateMigrationInCounter(1);
                     }
                 }
             }
@@ -201,51 +209,63 @@ public class BioSystem {
 
         Microhabitat[] updated_microhabs = microhabitats.clone();
 
-        double immigrationRate  = 100.;
-        int nImmigrants = new PoissonDistribution(immigrationRate*tau).sample();
+        double tau_step = tau;
 
-        int biofilmSize = getBiofilmSize();
-        int[][] replicationAllocations = new int[biofilmSize][];
-        int[][] deathAllocations = new int[biofilmSize][];
-        int[] migrationAllocations = new int[biofilmSize];
+        whileloop:
+        while(true) {
+            //TODO replace all the tau with tau_step thing
+            double immigrationRate  = 100.;
+            int nImmigrants = new PoissonDistribution(immigrationRate*tau_step).sample();
 
 
-        int mh_counter = 0;
-        for(int mh_index = getBiofilmEdge(); mh_index < L; mh_index++){
+            int biofilmSize = getBiofilmSize();
+            int[][] replicationAllocations = new int[biofilmSize][];
+            int[][] deathAllocations = new int[biofilmSize][];
+            int[] migrationAllocations = new int[biofilmSize];
 
-            int mh_pop = microhabitats[mh_index].getN();
 
-            double migration_rate = microhabitats[mh_index].migrate_rate();
-            int n_migrations = (migration_rate > 0) ? new PoissonDistribution(migration_rate*tau).sample() : 0;
+            int mh_counter = 0;
+            for(int mh_index = getBiofilmEdge(); mh_index < L; mh_index++) {
 
-            int[] n_replications = new int[mh_pop];
-            int[] n_deaths = new int[mh_pop];
+                int mh_pop = microhabitats[mh_index].getN();
 
-            for(int bac_index = 0; bac_index < mh_pop; bac_index++){
-                //works out the no. of replications each bacteria undergoes
-                double gOrDRate_i = microhabitats[mh_index].replicationOrDeathRate(bac_index);
+                double migration_rate = microhabitats[mh_index].migrate_rate();
+                int n_migrations = (migration_rate > 0) ? new PoissonDistribution(migration_rate*tau_step).sample() : 0;
 
-                if(gOrDRate_i == 0){
-                    //this stops the poisson distribution getting funky with mean=0
-                    n_replications[bac_index] = 0;
-                    n_deaths[bac_index] = 0;
+                int[] n_replications = new int[mh_pop];
+                int[] n_deaths = new int[mh_pop];
 
-                }else if(gOrDRate_i > 0 ){
-                    n_replications[bac_index] = new PoissonDistribution(gOrDRate_i*tau).sample();
-                    n_deaths[bac_index] = 0;
+                for(int bac_index = 0; bac_index < mh_pop; bac_index++) {
+                    //works out the no. of replications each bacteria undergoes
+                    double gOrDRate_i = microhabitats[mh_index].replicationOrDeathRate(bac_index);
+
+                    if(gOrDRate_i == 0) {
+                        //this stops the poisson distribution getting funky with mean=0
+                        n_replications[bac_index] = 0;
+                        n_deaths[bac_index] = 0;
+
+                    } else if(gOrDRate_i > 0) {
+                        n_replications[bac_index] = new PoissonDistribution(gOrDRate_i*tau).sample();
+                        n_deaths[bac_index] = 0;
+                    } else {
+                        n_replications[bac_index] = 0;
+                        n_deaths[bac_index] = new PoissonDistribution(Math.abs(gOrDRate_i)*tau).sample();
+                        if(n_deaths[bac_index] > 1){
+                            tau_step/=2.;
+                            continue whileloop;
+                        }
+                    }
                 }
-                else {
-                    n_replications[bac_index] = 0;
-                    n_deaths[bac_index] = new PoissonDistribution(Math.abs(gOrDRate_i)*tau).sample();
-                }
+
+                replicationAllocations[mh_counter] = n_replications;
+                deathAllocations[mh_counter] = n_deaths;
+                migrationAllocations[mh_counter] = n_migrations;
+
+                mh_counter++;
             }
-
-            replicationAllocations[mh_counter] = n_replications;
-            deathAllocations[mh_counter] = n_deaths;
-            migrationAllocations[mh_counter] = n_migrations;
-
-            mh_counter++;
         }
+
+
 
 
         int mh_counter2 = 0;
@@ -303,7 +323,7 @@ public class BioSystem {
         double c_max = 10., alpha = 0.01, tau = 0.01;
 
         int nReps = 10, nMeasurements = 20;
-        double duration = 200., interval = duration/nMeasurements;
+        double duration = 200.0, interval = duration/nMeasurements;
 
         String popSizeFilename = "pyrithione-testing-pop_size-t="+String.valueOf(duration);
         String popDistbFilename = "pyrithione-testing-pop_distb-t="+String.valueOf(duration);
@@ -341,8 +361,8 @@ public class BioSystem {
 
                 if((bs.getTimeElapsed()%interval >= 0. && bs.getTimeElapsed()%interval <= 0.1*interval) && !alreadyRecorded){
 
-                    String output = String.format("time elapsed: %.3f \ttotal N: %d \tbiofilm edge: %d \tdouble deaths: %d / %d",
-                            bs.getTimeElapsed(), bs.getTotalN(), bs.getBiofilmEdge(), bs.getDoubleDeathCounter(), bs.getDeathCountero());
+                    String output = String.format("rep: %d \ttime elapsed: %.3f \ttotal N: %d \tbiofilm edge: %d \tdouble deaths: %d / %d",
+                            r, bs.getTimeElapsed(), bs.getTotalN(), bs.getBiofilmEdge(), bs.getDoubleDeathCounter(), bs.getDeathCountero());
 
                     System.out.println(output);
 
